@@ -27,8 +27,6 @@ Plug 'junegunn/vim-oblique'
 Plug 'junegunn/vim-fnr'
 Plug 'junegunn/vim-peekaboo'
 Plug 'junegunn/vim-journal'
-Plug 'junegunn/seoul256.vim'
-Plug 'junegunn/gv.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/limelight.vim'
 Plug 'junegunn/vader.vim',  { 'on': 'Vader', 'for': 'vader' }
@@ -36,6 +34,13 @@ Plug 'junegunn/vim-ruby-x', { 'on': 'RubyX' }
 Plug 'junegunn/fzf',        { 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/rainbow_parentheses.vim'
+Plug 'junegunn/gv.vim'
+Plug 'm2mdas/phpcomplete-extended' | Plug 'Shougo/vimproc.vim', { 'do': 'make' }
+Plug 'elmcast/elm-vim'
+Plug 'fatih/vim-go'
+Plug 'mattn/gist-vim' | Plug 'mattn/webapi-vim'
+Plug 'vim-pandoc/vim-criticmarkup'
+
 if v:version >= 703
   Plug 'junegunn/vim-after-object'
 endif
@@ -45,8 +50,7 @@ endif
 unlet! g:plug_url_format
 
 " Colors
-Plug 'tomasr/molokai'
-Plug 'chriskempson/vim-tomorrow-theme'
+Plug 'altercation/vim-colors-solarized'
 
 " Edit
 Plug 'tpope/vim-repeat'
@@ -187,61 +191,16 @@ endif
 " %#HighlightGroup#
 set statusline=%<[%n]\ %F\ %m%r%y\ %{exists('g:loaded_fugitive')?fugitive#statusline():''}\ %=%-14.(%l,%c%V%)\ %P
 silent! if emoji#available()
-  let s:ft_emoji = map({
-    \ 'c':          'baby_chick',
-    \ 'clojure':    'lollipop',
-    \ 'coffee':     'coffee',
-    \ 'cpp':        'chicken',
-    \ 'css':        'art',
-    \ 'eruby':      'ring',
-    \ 'gitcommit':  'soon',
-    \ 'haml':       'hammer',
-    \ 'help':       'angel',
-    \ 'html':       'herb',
-    \ 'java':       'older_man',
-    \ 'javascript': 'monkey',
-    \ 'make':       'seedling',
-    \ 'markdown':   'book',
-    \ 'perl':       'camel',
-    \ 'python':     'snake',
-    \ 'ruby':       'gem',
-    \ 'scala':      'barber',
-    \ 'sh':         'shell',
-    \ 'slim':       'dancer',
-    \ 'text':       'books',
-    \ 'vim':        'poop',
-    \ 'vim-plug':   'electric_plug',
-    \ 'yaml':       'yum',
-    \ 'yaml.jinja': 'yum'
-  \ }, 'emoji#for(v:val)')
-
-  function! S_filetype()
-    if empty(&filetype)
-      return emoji#for('grey_question')
-    else
-      return get(s:ft_emoji, &filetype, '['.&filetype.']')
-    endif
-  endfunction
-
-  function! S_modified()
-    if &modified
-      return emoji#for('kiss').' '
-    elseif !&modifiable
-      return emoji#for('construction').' '
-    else
-      return ''
-    endif
-  endfunction
-
   function! S_fugitive()
     if !exists('g:loaded_fugitive')
       return ''
     endif
     let head = fugitive#head()
+    let master = head == 'master' ? emoji#for('crown') : ''
     if empty(head)
       return ''
     else
-      return head == 'master' ? emoji#for('crown') : emoji#for('dango').'='.head
+      return master.head
     endif
   endfunction
 
@@ -253,18 +212,26 @@ silent! if emoji#available()
     return s:braille[pos]
   endfunction
 
-  hi def link User1 TablineFill
-  let s:cherry = emoji#for('cherry_blossom')
+  function! S_modified()
+    if &modified
+      return emoji#for('writing_hand').' '
+    elseif !&modifiable
+      return emoji#for('lock_with_ink_pen').' '
+    else
+      return emoji#for('ok_hand').' '
+    endif
+  endfunction
+ 
+  " hi def link User1 TablineFill
   function! MyStatusLine()
     let mod = '%{S_modified()}'
     let ro  = "%{&readonly ? emoji#for('lock') . ' ' : ''}"
-    let ft  = '%{S_filetype()}'
     let fug = ' %{S_fugitive()}'
     let sep = ' %= '
     let pos = ' %l,%c%V '
     let pct = ' %P '
 
-    return s:cherry.' [%n] %F %<'.mod.ro.ft.fug.sep.pos.'%{Braille()}%*'.pct.s:cherry
+    return '[%n] %F %<'.mod.ro.fug.sep.pos.'%{Braille()}%*'.pct
   endfunction
 
   " Note that the "%!" expression is evaluated in the context of the
@@ -314,9 +281,11 @@ set nostartofline
 
 if has('gui_running')
   set guifont=Monaco:h14 columns=80 lines=40
-  silent! colo seoul256-light
+  set background=light
+  silent! colo solarized
 else
-  silent! colo seoul256
+  set background=dark
+  silent! colo solarized
 endif
 
 " }}}
@@ -356,9 +325,8 @@ nnoremap g[ :pop<cr>
 " Jump list (to newer position)
 nnoremap <C-p> <C-i>
 
-" <F10> | NERD Tree
-inoremap <F10> <esc>:NERDTreeToggle<cr>
-nnoremap <F10> :NERDTreeToggle<cr>
+" NERD Tree
+nnoremap <leader>e :NERDTreeToggle<cr>
 
 " <F11> | Tagbar
 if v:version >= 703
@@ -797,7 +765,7 @@ function! s:file_type_handler()
     call s:syntax_include('jinja', '{%', '%}', 1)
   elseif &ft =~ 'mkd\|markdown'
     let map = { 'bash': 'sh' }
-    for lang in ['ruby', 'yaml', 'vim', 'sh', 'bash', 'python', 'java', 'c', 'clojure', 'sql', 'gnuplot']
+    for lang in ['ruby', 'yaml', 'vim', 'sh', 'bash', 'python', 'java', 'c', 'clojure', 'sql', 'gnuplot', 'php', 'js', 'html', 'scala', 'go', 'elm']
       call s:syntax_include(get(map, lang, lang), '```'.lang, '```', 0)
     endfor
 
@@ -1330,7 +1298,7 @@ command! -nargs=1 -bar Grep execute 'silent! grep! <q-args>' | redraw! | copen
 " vim-copy-as-rtf
 " ----------------------------------------------------------------------------
 silent! if has_key(g:plugs, 'vim-copy-as-rtf')
-  xnoremap <Leader>C <esc>:colo seoul256-light<cr>gv:CopyRTF<cr>:colo seoul256<cr>
+  xnoremap <Leader>C <esc>:set background=light <cr>gv:CopyRTF<cr>:set background=dark<cr>
 endif
 
 " ----------------------------------------------------------------------------
