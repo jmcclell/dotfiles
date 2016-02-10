@@ -40,6 +40,7 @@ Plug 'elmcast/elm-vim'
 Plug 'fatih/vim-go'
 Plug 'mattn/gist-vim' | Plug 'mattn/webapi-vim'
 Plug 'vim-pandoc/vim-criticmarkup'
+Plug 'wakatime/vim-wakatime'
 
 if v:version >= 703
   Plug 'junegunn/vim-after-object'
@@ -104,7 +105,7 @@ Plug 'slim-template/vim-slim'
 Plug 'Glench/Vim-Jinja2-Syntax'
 Plug 'wting/rust.vim'
 Plug 'tpope/vim-rails',      { 'for': []      }
-Plug 'derekwyatt/vim-scala', { 'for': 'scala' }
+Plug 'derekwyatt/vim-scala', { 'for': ['scala', 'sbt'] }
 Plug 'honza/dockerfile.vim'
 Plug 'solarnz/thrift.vim'
 Plug 'dag/vim-fish'
