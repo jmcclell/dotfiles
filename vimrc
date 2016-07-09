@@ -122,6 +122,7 @@ if s:darwin
   Plug 'junegunn/vim-xmark'
 endif
 
+
 " Color Scheme
 Plug 'jmcclell/vim-colors-solarized'
 
@@ -169,6 +170,9 @@ endif
 " Tmux Integration (like accessing tmux buffers)
 Plug 'tpope/vim-tbone'
 
+" Tmux config syntax highlighting
+Plug 'tmux-plugins/vim-tmux'
+
 " Enables indentation visualization with a thin vertical line
 Plug 'Yggdroot/indentLine', { 'on': 'IndentLinesEnable' }
 autocmd! User indentLine doautocmd indentLine Syntax
@@ -213,10 +217,8 @@ endif
 
 " }}}
 " ============================================================================
-" BASIC SETTINGS {{{
-" ============================================================================
 
-set termguicolors
+" set tgc
 syntax enable
 set background=dark
 " let g:solarized_termtrans=0
@@ -451,6 +453,9 @@ nnoremap g[ :pop<cr>
 
 " NERD Tree
 nnoremap <Leader>e :NERDTreeToggle<cr>
+let g:NERDTreeMapOpenSplit = "<C-x>"
+let g:NERDTreeMapOpenVSplit = "<C-v>"
+
 
 " <F11> | Tagbar
 if v:version >= 703
