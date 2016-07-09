@@ -1,0 +1,28 @@
+#!/bin/bash
+# vim: set ft=sh:
+
+set -e
+
+
+if [[ -z ${1+x} ]]
+then
+  echo "Normal. ${BRIGHT} Bright. ${DIM} Dim. ${NORMAL} Normal."
+  echo -e "\n${GREEN}Current Docker Environment:\n"
+  echo -e "$(env | grep 'DOCKER')" |
+     sed -E 's/^/    /g' | # Indent each line
+     sed -E "s/(DOCKER(_[A-Z]+)+=)/${BOLD}\1/g" | # Bold the var name
+     sed -E "s/=(.+)$/=${YELLOW}\1${RESET}/g"
+
+else
+  if [[ $1 == "--native" ]]
+  then
+    echo "Switching to Native Docker"
+    echo "Default Docker Engine socket: unix:/var/tmp/docker.sock"
+  else
+    echo "Switching to docker-machine: $1"
+    docker-machine env $1
+    eval $(docker-machine env $1)
+  fi
+fi
+
+echo -e $RESET

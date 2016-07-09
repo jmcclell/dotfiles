@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# https://github.com/junegunn/myvim
 
 set -u
 set -e
