@@ -86,7 +86,7 @@ Plug 'tpope/vim-dispatch'
 
 " Tab-completion.
 " TODO: Revisit this. Is this a good solution or should we look elsewhere?
-" Plug 'ervandew/supertab'
+Plug 'ervandew/supertab'
 
 " Narrow Region
 " Work with a subset of text in a separate window, write to push back to
@@ -121,11 +121,10 @@ endif
 if s:darwin
   Plug 'junegunn/vim-xmark'
 endif
-unlet! g:plug_url_format
 
 " Color Scheme
-set termguicolors
-Plug 'lifepillar/vim-solarized8'
+Plug 'jmcclell/vim-colors-solarized'
+
 
 " Makes the movement commands respect CamelCaseWords as boundaries
 Plug 'bkad/CamelCaseMotion'
@@ -208,6 +207,7 @@ endif
 " Lint
 Plug 'scrooloose/syntastic'
 
+unlet! g:plug_url_format
 call plug#end()
 endif
 
@@ -215,6 +215,21 @@ endif
 " ============================================================================
 " BASIC SETTINGS {{{
 " ============================================================================
+
+set termguicolors
+syntax enable
+set background=dark
+" let g:solarized_termtrans=0
+" let g:solarized_termcolors=16
+" let g:solarized_degrade=0
+" let g:solarized_bold=0
+" let g:solarized_underline=0
+" let g:solarized_italic=0
+" let g:solarized_contrast="normal"
+" let g:solarized_visibility="normal"
+
+call togglebg#map("<F2>")
+colorscheme solarized
 
 " Set Leader key to space
 let mapleader      = ' '
@@ -397,9 +412,6 @@ endif
 " Keep the cursor on the same column as it moves vertically
 set nostartofline
 
-" Make sure color theme is loaded
-silent! colorscheme solarized8_dark
-
 " }}}
 " ============================================================================
 " MAPPINGS {{{
@@ -461,7 +473,7 @@ noremap <Leader>gd :Gdiff<cr>
 noremap <Leader>gs :Gstatus<cr>
 
 " Enable CamelCaseMotion mappings
-call camelcasemotion#CreateMotionMappings('<C>')
+silent! call camelcasemotion#CreateMotionMappings('<C>')
 
 " Make Y behave like other capitals
 nnoremap Y y$
