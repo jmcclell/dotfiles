@@ -1,28 +1,56 @@
 #!/bin/bash
 # vim: set ft=sh:
 
-set -e
+function dockerenv() {
+  source "../lib/solarized-colors.sh"
+
+  function docker_env_status() {
+    echo -e "\n${BASE0}Current Docker Environment:${RESET}\n"
+    echo -e "$( (env | grep 'DOCKER') || echo "No environment configured." )"  |
+       sed -E 's/^/    /g'                             | # Indent each line
+       sed -E "s/(DOCKER(_[A-Z]+)+=)/${BASE0}\1/g"     | # Bold the var name
+       sed -E "s/=(.+)$/=${DIMMED}\1${RESET}/g"
+
+    echo -e "\n"
+    docker version || true
+  }
+
+  function usage() {
+    echo -e "\n${BASE2}dockerenv${RESET}\n"
+    echo "  ${NORMAL}Easily swap between ${LINK}Docker Native${NORMAL} and ${LINK}Docker Machine${RESET}\n"
+    echo -e "${BASE2}usage:${RESET}\n"
+    echo "  dockerenv                 ${DIMMED}Defaults to '--satus' if no args are given${RESET}"
+    echo "  dockerenv --help          ${DIMMED}Display status about local Docker environment${RESET}"
+    echo "  dockerenv --status        ${DIMMED}Display status about local Docker environment${RESET}"
+    echo "  dockerenv --native        ${DIMMED}Switch to native Docker by removing the docker-machine environment${RESET}"
+    echo "  dockerenv my-machine-name ${DIMMED}Switch to the \"my-machine-name\" docker-machine by importing its environment${RESET}"
+  }
 
 
-if [[ -z ${1+x} ]]
-then
-  echo "Normal. ${BRIGHT} Bright. ${DIM} Dim. ${NORMAL} Normal."
-  echo -e "\n${GREEN}Current Docker Environment:\n"
-  echo -e "$(env | grep 'DOCKER')" |
-     sed -E 's/^/    /g' | # Indent each line
-     sed -E "s/(DOCKER(_[A-Z]+)+=)/${BOLD}\1/g" | # Bold the var name
-     sed -E "s/=(.+)$/=${YELLOW}\1${RESET}/g"
-
-else
-  if [[ $1 == "--native" ]]
-  then
-    echo "Switching to Native Docker"
-    echo "Default Docker Engine socket: unix:/var/tmp/docker.sock"
+  if [[ -z ${1+x} ]] || [[ $1 =~ /^-{1,2}s(tatus){0,1}$/ ]]; then
+    docker_env_satus
+  elif [[ $1 =~ /^-{1,2}h(elp){0,1}$/ ]]; then
+    docker_env_status
+  elif [[ $1 =~ /^-{1,2}n(ative){0,1}$/ ]]; then
+    echo 'Clearing docker-machine environment.'
+    unset ${!DOCKER_*}
+    docker_env_status
+  elif [[ $1 =~ /^-/ ]]; then
+      usage
   else
-    echo "Switching to docker-machine: $1"
-    docker-machine env $1
-    eval $(docker-machine env $1)
+    eval $(docker-machine env "$1")
+    docker_env_status
   fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+   (   # We are being executed directly
+     source "../lib/solarized-colors.sh"
+     echo -e "\nInitializing ${BASE2}dockerenv${RESET}\n"
+     SHELL_NAME=$(basename $SHELL)
+     PROFILE_FILE=$(([[ $(basename $SHELL) == "zsh" ]] && echo "$HOME/.zshrc" ) || echo "$HOME/.bash_profile")
+     echo "Add the following line to your ${BASE2}${PROFILE_FILE}${RESET} file or an equivalent location:"
+     echo -e "\n  ${BASE2}source '${DIR}/$(basename $0)${RESET}'"
+   )
 fi
 
-echo -e $RESET
