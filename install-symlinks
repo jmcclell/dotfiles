@@ -1,0 +1,6 @@
+#!/bin/bash
+# vim: set ft=sh :
+
+ln ./solarized-dircolors ~/.dir_colors >/dev/null 2>&1 && echo "Added ~/.dir_colors" || echo "~/.dir_colors already exists - refusing to overwrite"
+ln ./tmux.conf ~/.tmux.conf >/dev/null 2>&1 && echo "Symlinked ~/.tmux.conf" || echo "~/.tmux.conf already exists - refusing to overwrite"
+
